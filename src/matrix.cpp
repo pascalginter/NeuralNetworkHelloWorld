@@ -1,5 +1,6 @@
 #include <vector>
 #include <stdexcept>
+#include <random>
 
 using namespace std;
 
@@ -70,7 +71,21 @@ public:
 		columns = v.size();
 	}
 
+ 
+	static Matrix randomMatrix(unsigned int rows, unsigned int columns, double mean, double standardDeviation){
+		random_device rd;
+    	mt19937 e2(rd());
+    	normal_distribution<> dist(mean, standardDeviation);
+
+    	auto v = vector<vector<double> >(rows, vector<double>(columns, 0));
+    	for (unsigned int i = 0; i<rows; i++){
+    		for (unsigned int j = 0; j<columns; j++){
+    			v[i][j] = dist(e2);
+    		}
+    	}
+    	Matrix rMatrix(v);
+    	return rMatrix;
+	}
+
 };
 
-
-this_is_a_intentional_compile_error
