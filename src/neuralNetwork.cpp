@@ -7,10 +7,9 @@ class NeuralNetwork{
 	int input_nodes, hidden_nodes, output_nodes;
 	double learningRate;
 
-	double sigmoid(double input){
-		return (1/(1+powf(M_E, -input)))*0.98+0.01;
+	static double sigmoid(double input){
+		return (1.0/(1.0+powf(M_E, -input)))*0.98+0.01;
 	}
-
 
 public:
 	Matrix wih, who;
@@ -29,7 +28,6 @@ public:
 		//convert inputs list to matrix
 		Matrix inputs = Matrix(inputs_list);
 		Matrix targets = Matrix(targets_list);
-
 		//calculate signals into hidden layer
 		Matrix hidden_inputs = wih * inputs;
 
@@ -95,7 +93,6 @@ public:
 	void printQuery(vector<double> inputs_list){
 		//convert to matrix
 		Matrix inputs = Matrix(inputs_list);
-		cout << "_________________________________ \n";
 		cout << "input Nodes: \n" << inputs.toString() << "\n";
 
 		//calculate signals into hidden layer

@@ -154,7 +154,7 @@ public:
 		for (int i=0; i<rows; i++){
 			for (int j=0; j<m.columns; j++){
 				for (int k=0; k<columns; k++){
-					v[i][j] += values[i][k]*m.values[k][j];
+					v[i][j] += (values[i][k]*m.values[k][j]);
 				}
 			}
 		}
@@ -219,7 +219,7 @@ public:
     	auto v = vector<vector<double> >(rows, vector<double>(columns, 0));
     	for (int i = 0; i<rows; i++){
     		for (int j = 0; j<columns; j++){
-    			v[i][j] = double(rand()) / (double(RAND_MAX) + 1.0);
+    			v[i][j] = 2*(double(rand()) / (double(RAND_MAX) + 1.0)) -1.0;
     		}
     	}
     	Matrix rMatrix(v);
