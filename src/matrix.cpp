@@ -226,6 +226,16 @@ public:
     	return rMatrix;
 	}
 
+	vector<double> toVector(){
+		vector<double> result;
+		for (int i = 0; i < rows; i++){
+			for (int j = 0; j < columns; j++){
+				result.push_back(values[i][j]);
+			}
+		}
+		return result;
+	}
+
 	string toString(){
 		string s = "";
 		for (int i=0; i<rows; i++){

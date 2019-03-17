@@ -1,5 +1,6 @@
 #include <vector>
 #include <fstream>
+#include <sstream>
 #pragma once
 
 class MNIST{
@@ -15,6 +16,22 @@ public:
 	}
 
 	static vector<MNIST> readFile(string fileName){
-		ifstream infile(fileName);
+		ifstream infile = ifstream(fileName);
+		string line;
+		vector<MNIST> result;
+
+		while (getline(infile, line)){
+			stringstream ss(line);
+			vector<int> lineNumbers;
+			vector<double> inputs_list;
+			int i;
+    		while (ss >> i){
+        		lineNumbers.push_back(i);
+        		if (ss.peek() == ',') ss.ignore();
+        	}
+        	for (int i = 1; i < lineNumbers.size(); i++) inputs_list.push_back(((double)lineNumbers[i]/255.0)*0.98+0.01);
+        	result.push_back(MNIST(inputs_list, lineNumbers[0]));
+   		}
+
 	}
 };
