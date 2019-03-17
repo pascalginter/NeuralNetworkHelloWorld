@@ -10,9 +10,8 @@ class Matrix{
 	vector<vector<double> > values;
 
 public: 
-	Matrix(){
 
-	}
+	Matrix(){}
 
 	Matrix(int rows, int columns){
 		values = vector<vector<double> >(rows, vector<double>(columns, 0));
@@ -34,11 +33,11 @@ public:
 		columns = v[0].size();
 	}
 
-	unsigned int nRows(){
+	int nRows(){
 		return rows;
 	}
 
-	unsigned int nColumns(){
+	int nColumns(){
 		return columns;
 	}
 
@@ -47,18 +46,35 @@ public:
 		return values[row][column];
 	}
 
-	void set(unsigned int row, unsigned int column, double value){
-		if ((row>=rows)||(column>=columns)) throw out_of_range("position not in matrix");
+	void set(int row, int column, double value){
+		if ((row<0)||(column<0)||(row>=rows)||(column>=columns)) throw out_of_range("position not in matrix");
 		values[row][column] = value;
 	}
 
-	void add(Matrix m){
+	void operator += (Matrix m){
 		if ((m.rows!=rows)||(m.columns!=columns)) throw out_of_range("Matrices need to be of the same size in order to be able to be added");
-		for (unsigned int i=0; i<rows; i++){
-			for (unsigned int j=0; j<columns; j++){
+		for (int i=0; i<rows; i++){
+			for (int j=0; j<columns; j++){
 				values[i][j] += m.values[i][j];
 			}
 		}
+	}
+
+	Matrix operator + (Matrix m){
+		if ((m.rows!=rows)||(m.columns!=columns)) throw out_of_range("Matrices need to be of the same size in order to be able to be added");
+		Matrix result = Matrix(m.rows, m.columns);
+		for (int i=0; i<rows; i++){
+			for (int j=0; j<columns; j++){
+				result.values[i][j] = values[i][j] + m.values[i][j];
+			}
+		}
+		return result;
+	}
+
+	Matrix operator + (double d){
+		Matrix result = this -> copy();
+		result += d;
+		return result;
 	}
 
 	void operator += (double d) {
@@ -69,19 +85,7 @@ public:
 		}
 	}
 
-	Matrix operator ^ () {
-		
-	}
-
-	void add(double d){
-		for (unsigned int i=0; i<rows; i++){
-			for (unsigned int j=0; j<columns; j++){
-				values[i][j] += d;
-			}
-		}
-	}
-
-	void multiply(double d){
+	void operator *= (double d){
 		for (unsigned int i=0; i<rows; i++){
 			for (unsigned int j=0; j<columns; j++){
 				values[i][j] *= d;
@@ -89,7 +93,13 @@ public:
 		}
 	}
 
-	void multiply(Matrix m){
+	Matrix operator * (double d){
+		Matrix result = this -> copy();
+		result *= d;
+		return result;
+	}
+
+	void operator *= (Matrix m){
 		if (columns!=m.rows) {
 			cerr << rows << "," << columns << " vs "<< m.rows << ", " << m.columns;
 			throw out_of_range("Can't multiply these sizes of matrices");
@@ -106,7 +116,7 @@ public:
 		columns = m.columns;
 	}
 
-	void multiplyByElement(Matrix m){
+	void operator ^= (Matrix m){
 		if ((m.rows!=rows)||(m.columns!=columns)){
 			cerr << rows << "," << columns << " vs "<< m.rows << ", " << m.columns;
 			throw out_of_range("Must be of same size, multiplyByElement");
@@ -116,6 +126,12 @@ public:
 				values[i][j] *= m.values[i][j];
 			}
 		}
+	}
+
+	Matrix operator ^ (Matrix m){
+		Matrix result = m.copy();
+		result ^= *this;
+		return result;
 	}
 
 	void transpose(){
@@ -130,40 +146,54 @@ public:
 		columns = v[0].size();
 	}
 
+	static Matrix transpose(Matrix m){
+		Matrix result = m.copy();
+		result.transpose();
+		return result;
+	}
+
 	Matrix copy(){
 		return Matrix(values);
 	}
 
  
-	static Matrix randomMatrix(unsigned int rows, unsigned int columns, double mean, double standardDeviation){
-		random_device rd;
-    	mt19937 e2(rd());
-    	normal_distribution<> dist(mean, standardDeviation);
-
+	static Matrix randomMatrix(int rows, int columns){
     	auto v = vector<vector<double> >(rows, vector<double>(columns, 0));
-    	for (unsigned int i = 0; i<rows; i++){
-    		for (unsigned int j = 0; j<columns; j++){
-    			v[i][j] = dist(e2);
+    	for (int i = 0; i<rows; i++){
+    		for (int j = 0; j<columns; j++){
+    			v[i][j] = double(rand()) / (double(RAND_MAX) + 1.0);
     		}
     	}
     	Matrix rMatrix(v);
     	return rMatrix;
 	}
 
-	static Matrix multiply(Matrix a, Matrix b){
-		Matrix temp = a.copy(); 
-		temp.multiply(b);
-		return temp;
+	Matrix operator * (Matrix b){
+		Matrix res = this -> copy(); 
+		res *= b;
+		return res;
 	}
 
-	static Matrix minus(Matrix a, Matrix b){
-		Matrix temp = b; 
-		temp.multiply(-1);
-		temp.add(a);
-		return temp;
+	Matrix operator - (Matrix b){
+		Matrix res = b.copy(); 
+		res *= -1;
+		res = res + *this;
+		return res;
 	}
 
+	Matrix operator - (double d){
+		return this -> copy() + (-d);
+	}
 
+	string toString(){
+		string s = "";
+		for (int i=0; i<rows; i++){
+			for (int j=0; j<columns; j++){
+				s += to_string(round(values[i][j]*100.0)/100.0) + " ";
+			}
+			s += "\n";
+		}
+		return s;
+	}
 
 };
-
