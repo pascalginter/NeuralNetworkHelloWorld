@@ -6,7 +6,7 @@
 using namespace std;
 
 class Matrix{ 
-	unsigned int rows, columns;
+	int rows, columns;
 	vector<vector<double> > values;
 
 public: 
@@ -15,8 +15,8 @@ public:
 
 	Matrix(int rows, int columns){
 		values = vector<vector<double> >(rows, vector<double>(columns, 0));
-		this->rows=rows;
-		this->columns=columns;
+		this -> rows = rows;
+		this -> columns = columns;
 	}
 
 	Matrix(vector<double> v){
@@ -72,30 +72,59 @@ public:
 	}
 
 	Matrix operator + (double d){
-		Matrix result = this -> copy();
-		result += d;
+		Matrix result = Matrix(values);
+		for (unsigned int i=0; i<rows; i++){
+			for (unsigned int j=0; j<columns; j++){
+				result.values[i][j] += d;
+			}
+		}
 		return result;
 	}
 
 	void operator += (double d) {
-		for (unsigned int i=0; i<rows; i++){
-			for (unsigned int j=0; j<columns; j++){
+		for (int i=0; i<rows; i++){
+			for (int j=0; j<columns; j++){
 				values[i][j] += d;
 			}
 		}
 	}
 
-	void operator *= (double d){
+	Matrix operator - (Matrix m){
+		if ((m.rows!=rows)||(m.columns!=columns)) throw out_of_range("Matrices need to be of the same size in order to be subtracted");
+		Matrix result = Matrix(m.rows, m.columns);
+		for (int i=0; i<rows; i++){
+			for (int j=0; j<columns; j++){
+				result.values[i][j] = values[i][j] - m.values[i][j];
+			}
+		}
+		return result;
+	}
+
+	Matrix operator - (double d){
+		Matrix result = Matrix(values);
 		for (unsigned int i=0; i<rows; i++){
 			for (unsigned int j=0; j<columns; j++){
+				result.values[i][j] -= d;
+			}
+		}
+		return result;
+	}
+
+	void operator *= (double d){
+		for (int i=0; i<rows; i++){
+			for (int j=0; j<columns; j++){
 				values[i][j] *= d;
 			}
 		}
 	}
 
 	Matrix operator * (double d){
-		Matrix result = this -> copy();
-		result *= d;
+		Matrix result = Matrix(values);
+		for (int i=0; i<rows; i++){
+			for (int j=0; j<columns; j++){
+				result.values[i][j] *= d;
+			}
+		}
 		return result;
 	}
 
@@ -105,9 +134,9 @@ public:
 			throw out_of_range("Can't multiply these sizes of matrices");
 		}
 		auto v = vector<vector<double> >(rows, vector<double>(m.columns, 0));
-		for (unsigned int i=0; i<rows; i++){
-			for (unsigned int j=0; j<m.columns; j++){
-				for (unsigned int k=0; k<columns; k++){
+		for (int i=0; i<rows; i++){
+			for (int j=0; j<m.columns; j++){
+				for (int k=0; k<columns; k++){
 					v[i][j] += values[i][k]*m.values[k][j];
 				}
 			}
@@ -116,6 +145,23 @@ public:
 		columns = m.columns;
 	}
 
+	Matrix operator * (Matrix m){
+		if (columns!=m.rows) {
+			cerr << rows << "," << columns << " vs "<< m.rows << ", " << m.columns;
+			throw out_of_range("Can't multiply these sizes of matrices");
+		}
+		auto v = vector<vector<double> >(rows, vector<double>(m.columns, 0));
+		for (int i=0; i<rows; i++){
+			for (int j=0; j<m.columns; j++){
+				for (int k=0; k<columns; k++){
+					v[i][j] += values[i][k]*m.values[k][j];
+				}
+			}
+		}
+		return Matrix(v);
+	}
+
+	//Multiplication by element
 	void operator ^= (Matrix m){
 		if ((m.rows!=rows)||(m.columns!=columns)){
 			cerr << rows << "," << columns << " vs "<< m.rows << ", " << m.columns;
@@ -129,8 +175,16 @@ public:
 	}
 
 	Matrix operator ^ (Matrix m){
-		Matrix result = m.copy();
-		result ^= *this;
+		if ((m.rows!=rows)||(m.columns!=columns)){
+			cerr << rows << "," << columns << " vs "<< m.rows << ", " << m.columns;
+			throw out_of_range("Must be of same size, multiplyByElement");
+		} 
+		Matrix result = Matrix(values);
+		for (int i=0; i<rows; i++){
+			for (int j=0; j<columns; j++){
+				result.values[i][j] *= m.values[i][j];
+			}
+		}
 		return result;
 	}
 
@@ -147,8 +201,12 @@ public:
 	}
 
 	static Matrix transpose(Matrix m){
-		Matrix result = m.copy();
-		result.transpose();
+		Matrix result = Matrix(m.columns, m.rows);
+		for (int i=0; i<m.rows; i++){
+			for (int j=0; j<m.columns; j++){
+				result.values[j][i] = m.values[i][j];
+			}
+		}
 		return result;
 	}
 
@@ -166,23 +224,6 @@ public:
     	}
     	Matrix rMatrix(v);
     	return rMatrix;
-	}
-
-	Matrix operator * (Matrix b){
-		Matrix res = this -> copy(); 
-		res *= b;
-		return res;
-	}
-
-	Matrix operator - (Matrix b){
-		Matrix res = b.copy(); 
-		res *= -1;
-		res = res + *this;
-		return res;
-	}
-
-	Matrix operator - (double d){
-		return this -> copy() + (-d);
 	}
 
 	string toString(){
