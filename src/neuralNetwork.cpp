@@ -92,4 +92,37 @@ public:
 		return final_outputs;
 	}
 
+	void printQuery(vector<double> inputs_list){
+		//convert to matrix
+		Matrix inputs = Matrix(inputs_list);
+		cout << "_________________________________ \n";
+		cout << "input Nodes: \n" << inputs.toString() << "\n";
+
+		//calculate signals into hidden layer
+		Matrix hidden_inputs = wih * inputs;
+		//calculate the signals emerging from hidden layer
+		Matrix hidden_outputs = Matrix(hidden_inputs.nRows(), hidden_inputs.nColumns());
+		for (int i=0; i<hidden_outputs.nRows(); i++){
+			for (int j=0; j<hidden_outputs.nColumns(); j++){
+				hidden_outputs.set(i, j, sigmoid(hidden_inputs.get(i, j)));
+			}
+		}
+
+		cout << "hidden Nodes: \n" << hidden_outputs.toString() << "\n";
+
+		//calculate signals into final output layer
+		Matrix final_inputs = who * hidden_outputs;
+		//calculate the signals emerging from final output layer
+		Matrix final_outputs = Matrix(final_inputs.nRows(), final_inputs.nColumns());
+		for (int i=0; i<final_outputs.nRows(); i++){
+			for (int j=0; j<final_outputs.nColumns(); j++){
+				final_outputs.set(i, j, sigmoid(final_inputs.get(i, j)));
+			}
+		}
+
+		cout << "output Nodes: \n" << final_outputs.toString() << "\n";
+		cout << "_________________________________ \n";
+
+	}
+
 };
