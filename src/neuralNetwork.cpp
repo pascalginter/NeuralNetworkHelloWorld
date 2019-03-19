@@ -24,7 +24,7 @@ public:
 		who = Matrix::randomMatrix(output_nodes, hidden_nodes);
 	}
 
-	void train(vector<double> inputs_list, vector<double> targets_list){
+	void train(vector<double> &inputs_list, vector<double> &targets_list){
 		//convert inputs list to matrix
 		Matrix inputs = Matrix(inputs_list);
 		Matrix targets = Matrix(targets_list);
@@ -63,7 +63,7 @@ public:
 		wih += ((hidden_errors ^ hidden_outputs ^ ((hidden_outputs - 1.0)* -1.0)) * Matrix::transpose(inputs)) * learningRate;
 	}
 
-	Matrix query(vector<double> inputs_list){
+	Matrix query(vector<double> &inputs_list){
 		//convert to matrix
 		Matrix inputs = Matrix(inputs_list);
 
@@ -90,7 +90,7 @@ public:
 		return final_outputs;
 	}
 
-	void printQuery(vector<double> inputs_list){
+	void printQuery(vector<double> &inputs_list){
 		//convert to matrix
 		Matrix inputs = Matrix(inputs_list);
 		cout << "input Nodes: \n" << inputs.toString() << "\n";

@@ -7,8 +7,10 @@
 using namespace std;
 
 int main(){
-	vector<MNIST> trainingData = MNIST::readFile("data/mnist_train.csv");
-	vector<MNIST> testData = MNIST::readFile("data/mnist_test.csv");
+	vector<MNIST> trainingData = MNIST::readFile("Data/mnist_train.csv");
+	vector<MNIST> testData = MNIST::readFile("Data/mnist_test.csv");
+
+	cout << "Size of trainign data: " << trainingData.size() << ", size of testData: " << testData.size() << "\n";
 
 	cout << "finished reading \n";
 	NeuralNetwork n = NeuralNetwork(784, 100, 10, 0.3);

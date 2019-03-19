@@ -17,18 +17,19 @@ class NeuralNetworkTrainer{
 	}
 
 public: 
-	static void train(NeuralNetwork n, vector<MNIST> dataset, int epochs){
+	static void train(NeuralNetwork &n, vector<MNIST> &dataset, int epochs){
+		int size = dataset.size();
 		cout << "started training \n";
 		for (int i = 0; i < epochs; i++){
 			cout << "training " << i << "\n";
-			for (int j = 0; j < dataset.size(); j++){
-				cout << "hello \n";
+			for (int j = 0; j < size; j++){
 				n.train(dataset[j].inputs_list, dataset[j].target_list);
 			}
 		}
 	}
 
-	static double test(NeuralNetwork n, vector<MNIST> dataset){
+	static double test(NeuralNetwork &n, vector<MNIST> &dataset){
+		cout << "starting queries \n";
 		double total = dataset.size(), score = 0.0;
 		for (int i = 0; i<dataset.size(); i++){
 			if (chosenPos(n.query(dataset[i].inputs_list).toVector())==dataset[i].result) score += 1.0;
