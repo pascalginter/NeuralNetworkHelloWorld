@@ -6,9 +6,9 @@
 
 class NeuralNetworkTrainer{
 	static int chosenPos(const vector<double> &result){
-		int maxPos = -1;
+		int maxPos = -1, size = result.size();
 		double maxValue = -1.0;
-		for (int i = 0; i < result.size(); i++){
+		for (int i = 0; i < size; i++){
 			if (maxValue < result[i]){
 				maxValue = result[i];
 				maxPos = i;
@@ -36,7 +36,7 @@ public:
 	static double test(NeuralNetwork &n, const vector<MNIST> &dataset){
 		cout << "starting queries \n";
 		double total = dataset.size(), score = 0.0;
-		for (int i = 0; i<dataset.size(); i++){
+		for (int i = 0; i < total; i++){
 			if (chosenPos(n.query(dataset[i].inputs_list).toVector())==dataset[i].result) score += 1.0;
 		}
 		return score/total;

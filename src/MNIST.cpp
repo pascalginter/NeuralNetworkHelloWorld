@@ -5,7 +5,7 @@
 
 class MNIST{
 public:
-	vector<double> inputs_list, target_list;
+	vector<double> &inputs_list, &target_list;
 	int result;
 
 	MNIST(vector<double> inputs_list, int result){

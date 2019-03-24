@@ -29,7 +29,7 @@ public:
 	Matrix(vector<vector<double> > &v){
 		rows = v.size();
 		columns = v[0].size();
-		values = v;
+		values = move(v);
 	}
 
 	int nRows(){
@@ -50,90 +50,56 @@ public:
 		values[row][column] = value;
 	}
 
-	void operator = (const Matrix &m){
+	Matrix& operator = (const Matrix &m){
 		rows = m.rows;
 		columns = m.columns;
 		values = move(m.values);
+		return *this;
 	}
 
-	void operator += (const Matrix &m){
+	Matrix& operator += (const Matrix &m){
 		if ((m.rows!=rows)||(m.columns!=columns)) throw out_of_range("Matrices need to be of the same size in order to be able to be added");
 		for (int i=0; i<rows; i++){
 			for (int j=0; j<columns; j++){
 				values[i][j] += m.values[i][j];
 			}
 		}
+		return *this;
 	}
 
-	Matrix operator + (const Matrix &m){
-		if ((m.rows!=rows)||(m.columns!=columns)) throw out_of_range("Matrices need to be of the same size in order to be able to be added");
-		Matrix result = Matrix(m.rows, m.columns);
-		for (int i=0; i<rows; i++){
-			for (int j=0; j<columns; j++){
-				result.values[i][j] = values[i][j] + m.values[i][j];
-			}
-		}
-		return result;
-	}
-
-	Matrix operator + (double d){
-		Matrix result = Matrix(values);
-		for (unsigned int i=0; i<rows; i++){
-			for (unsigned int j=0; j<columns; j++){
-				result.values[i][j] += d;
-			}
-		}
-		return result;
-	}
-
-	void operator += (double d) {
+	Matrix& operator += (double d) {
 		for (int i=0; i<rows; i++){
 			for (int j=0; j<columns; j++){
 				values[i][j] += d;
 			}
 		}
+		return *this;
 	}
 
-	Matrix operator - (const Matrix &m){
-		if ((m.rows!=rows)||(m.columns!=columns)) throw out_of_range("Matrices need to be of the same size in order to be subtracted");
-		Matrix result = Matrix(m.rows, m.columns);
+	Matrix& operator -= (const Matrix &m){
+		if ((m.rows!=rows)||(m.columns!=columns)) throw out_of_range("Matrices need to be of the same size in order to be able to be subtracted");
 		for (int i=0; i<rows; i++){
 			for (int j=0; j<columns; j++){
-				result.values[i][j] = values[i][j] - m.values[i][j];
+				values[i][j] -= m.values[i][j];
 			}
 		}
-		return result;
+		return *this;
+	} 
+
+	Matrix& operator -= (double d){
+		return (*this += -d);
 	}
 
-	Matrix operator - (double d){
-		Matrix result = Matrix(values);
-		for (unsigned int i=0; i<rows; i++){
-			for (unsigned int j=0; j<columns; j++){
-				result.values[i][j] -= d;
-			}
-		}
-		return result;
-	}
-
-	void operator *= (double d){
+	Matrix& operator *= (double d){
 		for (int i=0; i<rows; i++){
 			for (int j=0; j<columns; j++){
 				values[i][j] *= d;
 			}
 		}
+		return *this;
 	}
 
-	Matrix operator * (double d){
-		Matrix result = Matrix(values);
-		for (int i=0; i<rows; i++){
-			for (int j=0; j<columns; j++){
-				result.values[i][j] *= d;
-			}
-		}
-		return result;
-	}
-
-	void operator *= (const Matrix &m){
+	Matrix& operator *= (const Matrix &m){
 		if (columns!=m.rows) {
 			cerr << rows << "," << columns << " vs "<< m.rows << ", " << m.columns;
 			throw out_of_range("Can't multiply these sizes of matrices");
@@ -148,27 +114,11 @@ public:
 		}
 		values = move(v);
 		columns = m.columns;
-	}
-
-	Matrix operator * (const Matrix &m){
-		if (columns!=m.rows) {
-			cerr << rows << "," << columns << " vs "<< m.rows << ", " << m.columns;
-			throw out_of_range("Can't multiply these sizes of matrices");
-		}
-		auto v = vector<vector<double> >(rows, vector<double>(m.columns, 0));
-		for (int i=0; i<rows; i++){
-			for (int j=0; j<m.columns; j++){
-				for (int k=0; k<columns; k++){
-					v[i][j] += (values[i][k]*m.values[k][j]);
-					
-				}
-			}
-		}
-		return Matrix(v);
+		return *this;
 	}
 
 	//Multiplication by element
-	void operator ^= (const Matrix &m){
+	Matrix& operator ^= (const Matrix &m){
 		if ((m.rows!=rows)||(m.columns!=columns)){
 			cerr << rows << "," << columns << " vs "<< m.rows << ", " << m.columns;
 			throw out_of_range("Must be of same size, multiplyByElement");
@@ -178,21 +128,9 @@ public:
 				values[i][j] *= m.values[i][j];
 			}
 		}
+		return *this;
 	}
 
-	Matrix operator ^ (const Matrix &m){
-		if ((m.rows!=rows)||(m.columns!=columns)){
-			cerr << rows << "," << columns << " vs "<< m.rows << ", " << m.columns;
-			throw out_of_range("Must be of same size, multiplyByElement");
-		} 
-		Matrix result = Matrix(values);
-		for (int i=0; i<rows; i++){
-			for (int j=0; j<columns; j++){
-				result.values[i][j] *= m.values[i][j];
-			}
-		}
-		return result;
-	}
 
 	void transpose(){
 		cout << "transpose \n";
@@ -234,10 +172,10 @@ public:
 	}
 
 	vector<double> toVector(){
-		vector<double> result;
+		vector<double> result = vector<double>(rows*columns, 0);
 		for (int i = 0; i < rows; i++){
 			for (int j = 0; j < columns; j++){
-				result.push_back(values[i][j]);
+				result[i*columns+j] = values[i][j];
 			}
 		}
 		return result;
@@ -255,3 +193,39 @@ public:
 	}
 
 };
+
+inline Matrix operator + (Matrix lhs, const Matrix &rhs){
+	lhs += rhs;
+	return lhs;
+}
+
+inline Matrix operator + (Matrix lhs, double rhs){
+	lhs += rhs;
+	return lhs;
+}
+
+inline Matrix operator - (Matrix lhs, double rhs){
+	lhs -= rhs;
+	return lhs;
+}
+
+inline Matrix operator - (Matrix lhs, const Matrix &rhs){
+	lhs -= rhs;
+	return lhs;
+}
+
+
+inline Matrix operator * (Matrix lhs, const Matrix &rhs){
+	lhs *= rhs;
+	return lhs;
+}
+
+inline Matrix operator * (Matrix lhs, double rhs){
+	lhs *= rhs;
+	return lhs;
+}
+
+inline Matrix operator ^ (Matrix lhs, const Matrix &rhs){
+	lhs ^= rhs;
+	return lhs;
+}
