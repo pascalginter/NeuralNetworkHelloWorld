@@ -24,7 +24,7 @@ public:
 		who = Matrix::randomMatrix(output_nodes, hidden_nodes);
 	}
 
-	void train(vector<double> &inputs_list, vector<double> &targets_list){
+	void train(const vector<double> &inputs_list, const vector<double> &targets_list){
 		//convert inputs list to matrix
 		Matrix inputs = Matrix(inputs_list);
 		Matrix targets = Matrix(targets_list);
@@ -56,14 +56,16 @@ public:
 		//hidden layer errors is the output_errors, split by weights, recombined at hidden nodes
 		Matrix hidden_errors = Matrix::transpose(who) * output_errors;
 
+		Matrix whoAdj = output_errors ^ final_outputs;
+		
 		//update the weights for the links between the hidden and output layers
-		who += ((output_errors ^ final_outputs ^ ((final_outputs - 1.0) * -1.0)) * Matrix::transpose(hidden_outputs)) * learningRate;
+		who += (((output_errors ^ final_outputs ^ ((final_outputs - 1.0) * -1.0)) * Matrix::transpose(hidden_outputs)) * learningRate);
 
 		//update the weights for the links between the input and hidden layers
-		wih += ((hidden_errors ^ hidden_outputs ^ ((hidden_outputs - 1.0)* -1.0)) * Matrix::transpose(inputs)) * learningRate;
+		wih += (((hidden_errors ^ hidden_outputs ^ ((hidden_outputs - 1.0)* -1.0)) * Matrix::transpose(inputs)) * learningRate);
 	}
 
-	Matrix query(vector<double> &inputs_list){
+	Matrix query(const vector<double> &inputs_list){
 		//convert to matrix
 		Matrix inputs = Matrix(inputs_list);
 
@@ -90,7 +92,7 @@ public:
 		return final_outputs;
 	}
 
-	void printQuery(vector<double> &inputs_list){
+	void printQuery(const vector<double> &inputs_list){
 		//convert to matrix
 		Matrix inputs = Matrix(inputs_list);
 		cout << "input Nodes: \n" << inputs.toString() << "\n";
