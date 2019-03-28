@@ -12,7 +12,7 @@ class NeuralNetwork{
 	}
 
 public:
-	Matrix wih, who;
+	Matrix wih; Matrix who;
 
 	NeuralNetwork(int input_nodes, int hidden_nodes, int output_nodes, double learningRate){
 		this->input_nodes = input_nodes;
@@ -20,8 +20,9 @@ public:
 		this->output_nodes = output_nodes;
 		this->learningRate = learningRate;
 
-		wih = Matrix::randomMatrix(hidden_nodes, input_nodes);
-		who = Matrix::randomMatrix(output_nodes, hidden_nodes);
+		wih = Matrix::randomMatrix(hidden_nodes, input_nodes); //784 x 100
+        who = Matrix::randomMatrix(output_nodes, hidden_nodes); //100 x 10
+
 	}
 
 	void train(const vector<double> &inputs_list, const vector<double> &targets_list){
@@ -55,8 +56,6 @@ public:
 		Matrix output_errors = targets - final_outputs;
 		//hidden layer errors is the output_errors, split by weights, recombined at hidden nodes
 		Matrix hidden_errors = Matrix::transpose(who) * output_errors;
-
-		Matrix whoAdj = output_errors ^ final_outputs;
 		
 		//update the weights for the links between the hidden and output layers
 		who += (((output_errors ^ final_outputs ^ ((final_outputs - 1.0) * -1.0)) * Matrix::transpose(hidden_outputs)) * learningRate);
@@ -90,8 +89,10 @@ public:
 		}
 
 		return final_outputs;
+
 	}
 
+	
 	void printQuery(const vector<double> &inputs_list){
 		//convert to matrix
 		Matrix inputs = Matrix(inputs_list);
@@ -123,5 +124,6 @@ public:
 		cout << "_________________________________ \n";
 
 	}
+	
 
 };

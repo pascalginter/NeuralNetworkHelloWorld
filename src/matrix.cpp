@@ -1,6 +1,7 @@
 #include <vector>
 #include <stdexcept>
 #include <random>
+#include <chrono>
 #pragma once
 
 using namespace std;
@@ -13,32 +14,32 @@ public:
 
 	Matrix(){}
 
-	Matrix(int rows, int columns){
-		values = vector<vector<double> >(rows, vector<double>(columns, 0));
-		this -> rows = rows;
-		this -> columns = columns;
-	}
+    Matrix(vector<vector<double> > &v){
+        rows = v.size();
+		columns = v[0].size();
+		values = move(v);
+    }
 
-	Matrix(const vector<double> &v){
+    Matrix(int rows, int columns){
+        this->columns = columns;
+        this->rows = rows;
+        values =  vector<vector<double> > (rows, vector<double>(columns, 0.0));;
+    }
+
+    Matrix(const vector<double> &v){
 		values = vector<vector<double> >(v.size(), vector<double>(1, 0.0));
 		rows = v.size();
 		for (int i=0; i<rows; i++) values[i][0] = v[i];
 		columns = 1;
-	}
+}
 
-	Matrix(vector<vector<double> > &v){
-		rows = v.size();
-		columns = v[0].size();
-		values = move(v);
-	}
+    int nRows(){
+        return rows;
+    }
 
-	int nRows(){
-		return rows;
-	}
-
-	int nColumns(){
-		return columns;
-	}
+    int nColumns(){
+        return columns;
+    }
 
 	double get(int row, int column){
 		if ((row<0)||(column<0)||(row>=rows)||(column>=columns)) throw out_of_range("position not in matrix");
@@ -77,10 +78,10 @@ public:
 	}
 
 	Matrix& operator -= (const Matrix &m){
-		if ((m.rows!=rows)||(m.columns!=columns)) throw out_of_range("Matrices need to be of the same size in order to be able to be subtracted");
-		for (int i=0; i<rows; i++){
-			for (int j=0; j<columns; j++){
-				values[i][j] -= m.values[i][j];
+		if ((m.rows!=this->rows)||(m.columns!=this->columns)) throw out_of_range("Matrices need to be of the same size in order to be able to be subtracted");
+		for (int i=0; i<this->rows; i++){
+			for (int j=0; j<this->columns; j++){
+				this->values[i][j] -= m.values[i][j];
 			}
 		}
 		return *this;
@@ -104,10 +105,10 @@ public:
 			cerr << rows << "," << columns << " vs "<< m.rows << ", " << m.columns;
 			throw out_of_range("Can't multiply these sizes of matrices");
 		}
-		auto v = vector<vector<double> >(rows, vector<double>(m.columns, 0));
-		for (int i=0; i<rows; i++){
-			for (int j=0; j<m.columns; j++){
-				for (int k=0; k<columns; k++){
+		auto v = vector<vector<double> >(rows, vector<double>(m.columns, 0.0));
+		for (int k=0; k<columns; k++){
+			for (int i=0; i<rows; i++){
+				for (int j=0; j<m.columns; j++){
 					v[i][j] += (values[i][k]*m.values[k][j]);
 				}
 			}
@@ -133,7 +134,6 @@ public:
 
 
 	void transpose(){
-		cout << "transpose \n";
 		auto v = vector<vector<double> >(columns, vector<double>(rows, 0));
 		for (unsigned int i=0; i<rows; i++){
 			for (unsigned int j=0; j<columns; j++){
